@@ -27,8 +27,20 @@ def pdf_to_csv(pdf_path, csv_path):
         log_message(f"Error during PDF to CSV conversion: {str(e)}")
         raise
 
+def get_file_sha(repo, path, token):
+    api_url = f"https://api.github.com/repos/{repo}/contents/{path}"
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        return response.json()["sha"]
+    return None
+
 def upload_to_github(csv_file, repo, branch, token):
-    api_url = f"https://api.github.com/repos/{repo}/contents/csv-folder/{os.path.basename(csv_file)}"
+    file_path = f"csv-folder/{os.path.basename(csv_file)}"
+    api_url = f"https://api.github.com/repos/{repo}/contents/{file_path}"
     log_message(f"Uploading CSV to GitHub at {api_url}")
     
     try:
@@ -42,11 +54,16 @@ def upload_to_github(csv_file, repo, branch, token):
             "Accept": "application/vnd.github.v3+json"
         }
 
+        sha = get_file_sha(repo, file_path, token)
+        
         data = {
-            "message": "Adding converted CSV file",
+            "message": "Adding or updating converted CSV file",
             "content": encoded_content,
             "branch": branch
         }
+        
+        if sha:
+            data["sha"] = sha
 
         response = requests.put(api_url, headers=headers, json=data)
         log_message(f"Response status code: {response.status_code}")
