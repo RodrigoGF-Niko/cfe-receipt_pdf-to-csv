@@ -1,8 +1,9 @@
 name: PDF to CSV Converter
 
 on:
-  repository_dispatch:
-    types: [convert-pdf]
+  push:
+    paths:
+      - '*.pdf'
 
 jobs:
   convert:
@@ -24,4 +25,4 @@ jobs:
       - name: Run PDF to CSV Script
         run: |
           echo "Running PDF to CSV conversion script"
-          python pdf_to_csv.py "${{ github.event.client_payload.pdf_url }}" "RodrigoGF-Niko/cfe-receipt_pdf-to-csv" "main" "${{ secrets.GITHUB_TOKEN }}"
+          python pdf_to_csv.py "${{ github.event.head_commit.modified[0] }}" "RodrigoGF-Niko/cfe-receipt_pdf-to-csv" "main" "${{ secrets.GITHUB_TOKEN }}"
