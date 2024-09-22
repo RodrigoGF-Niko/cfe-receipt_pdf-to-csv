@@ -24,4 +24,4 @@ jobs:
 
       - name: Run PDF to CSV Script
         run: |
-          python pdf_to_csv.py
+          python pdf_to_csv.py "${{ github.event.client_payload.pdf_url }}" "RodrigoGF-Niko/cfe-receipt_pdf-to-csv" "main" "${{ secrets.GITHUB_TOKEN }}"
