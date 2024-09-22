@@ -6,13 +6,17 @@ from PyPDF2 import PdfReader
 
 # Step 1: Function to download the PDF
 def download_pdf(pdf_url, download_path):
+    print(f"Downloading PDF from {pdf_url} to {download_path}")
     response = requests.get(pdf_url)
+    response.raise_for_status()  # Raise an error for bad status codes
     with open(download_path, 'wb') as file:
         file.write(response.content)
+    print(f"PDF downloaded successfully to {download_path}")
     return download_path
 
 # Step 2: Convert the PDF into a CSV
 def pdf_to_csv(pdf_path, csv_path):
+    print(f"Converting PDF at {pdf_path} to CSV at {csv_path}")
     reader = PdfReader(pdf_path)
     csv_data = []
 
@@ -25,10 +29,12 @@ def pdf_to_csv(pdf_path, csv_path):
         writer = csv.writer(file)
         for row in csv_data:
             writer.writerow(row)
+    print(f"CSV conversion completed successfully at {csv_path}")
 
 # Step 3: Upload the CSV back to GitHub using GitHub API
 def upload_to_github(csv_file, repo, branch, token):
     api_url = f"https://api.github.com/repos/{repo}/contents/{os.path.basename(csv_file)}"
+    print(f"Uploading CSV to GitHub at {api_url}")
     with open(csv_file, 'rb') as file:
         content = file.read()
 
@@ -46,6 +52,8 @@ def upload_to_github(csv_file, repo, branch, token):
     }
 
     response = requests.put(api_url, headers=headers, json=data)
+    response.raise_for_status()  # Raise an error for bad status codes
+    print(f"CSV uploaded successfully to GitHub with status code {response.status_code}")
     return response.status_code
 
 # Step 4: Main function
