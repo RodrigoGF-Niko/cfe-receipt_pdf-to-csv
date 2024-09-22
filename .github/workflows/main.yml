@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout repository content
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # To ensure we can access the previous commit
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -26,13 +28,13 @@ jobs:
         id: identify_pdf
         run: |
           echo "Identifying uploaded PDF file"
-          pdf_file=$(git log -1 --name-only --pretty=format: | grep 'pdf-folder/.*\.pdf')
+          pdf_file=$(git diff --name-only HEAD^ HEAD | grep 'pdf-folder/.*\.pdf' | head -n 1)
           if [ -z "$pdf_file" ]; then
             echo "Error: No PDF file found in the latest commit."
             exit 1
           fi
           echo "PDF file identified: $pdf_file"
-          echo "::set-output name=pdf_path::$pdf_file"
+          echo "pdf_path=$pdf_file" >> $GITHUB_OUTPUT
 
       - name: Log PDF path
         run: |
@@ -42,6 +44,18 @@ jobs:
         run: |
           echo "Waiting for the file to be fully uploaded"
           sleep 10  # Wait for 10 seconds to ensure the file is fully uploaded
+
+      - name: Run PDF to CSV Script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Running PDF to CSV conversion script"
+          python pdf_to_csv.py "${{ steps.identify_pdf.outputs.pdf_path }}" "${{ github.repository }}" "${{ github.ref_name }}" "$GITHUB_TOKEN"
+
+      - name: Log workflow completion
+        if: always()
+        run: |
+          echo "Workflow completed. Check logs for any errors or issues."
 
       - name: Run PDF to CSV Script
         run: |
