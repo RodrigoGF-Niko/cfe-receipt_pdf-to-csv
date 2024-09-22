@@ -3,7 +3,7 @@ name: PDF to CSV Converter
 on:
   push:
     paths:
-      - '*.pdf'
+      - 'pdf-folder/*.pdf'
 
 jobs:
   convert:
@@ -24,7 +24,9 @@ jobs:
 
       - name: Identify the uploaded PDF file
         id: identify_pdf
-        run: echo "::set-output name=pdf_path::$(git diff --name-only HEAD^ HEAD | grep '.pdf')"
+        run: |
+          echo "Identifying uploaded PDF file"
+          echo "::set-output name=pdf_path::$(git diff --name-only HEAD^ HEAD | grep 'pdf-folder/.*\.pdf')"
 
       - name: Run PDF to CSV Script
         run: |
