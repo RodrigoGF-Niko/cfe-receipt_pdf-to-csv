@@ -1,0 +1,27 @@
+name: PDF to CSV Converter
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [convert-pdf]
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests PyPDF2
+
+      - name: Run PDF to CSV Script
+        run: |
+          python pdf_to_csv.py
