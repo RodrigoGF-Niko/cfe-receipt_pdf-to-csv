@@ -26,7 +26,21 @@ jobs:
         id: identify_pdf
         run: |
           echo "Identifying uploaded PDF file"
-          echo "::set-output name=pdf_path::$(git diff --name-only HEAD^ HEAD | grep 'pdf-folder/.*\.pdf')"
+          pdf_file=$(git diff --name-only HEAD^ HEAD | grep 'pdf-folder/.*\.pdf')
+          if [ -z "$pdf_file" ]; then
+            echo "Error: No PDF file found in the latest commit."
+            exit 1
+          fi
+          echo "PDF file identified: $pdf_file"
+          echo "::set-output name=pdf_path::$pdf_file"
+
+      - name: Log PDF path
+        run: echo "PDF path: ${{ steps.identify_pdf.outputs.pdf_path }}"
+
+      - name: Wait for file to be fully uploaded
+        run: |
+          echo "Waiting for the file to be fully uploaded"
+          sleep 10  # Wait for 10 seconds to ensure the file is fully uploaded
 
       - name: Run PDF to CSV Script
         run: |
