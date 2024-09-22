@@ -35,7 +35,8 @@ jobs:
           echo "::set-output name=pdf_path::$pdf_file"
 
       - name: Log PDF path
-        run: echo "PDF path: ${{ steps.identify_pdf.outputs.pdf_path }}"
+        run: |
+          echo "PDF path: ${{ steps.identify_pdf.outputs.pdf_path }}"
 
       - name: Wait for file to be fully uploaded
         run: |
