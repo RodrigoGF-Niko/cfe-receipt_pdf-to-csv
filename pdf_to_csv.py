@@ -1,6 +1,7 @@
 import requests
 import os
 import csv
+import base64
 from PyPDF2 import PdfReader
 
 # Step 1: Function to download the PDF
@@ -27,11 +28,11 @@ def pdf_to_csv(pdf_path, csv_path):
 
 # Step 3: Upload the CSV back to GitHub using GitHub API
 def upload_to_github(csv_file, repo, branch, token):
-    api_url = f"https://api.github.com/repos/{repo}/contents/{csv_file}"
+    api_url = f"https://api.github.com/repos/{repo}/contents/{os.path.basename(csv_file)}"
     with open(csv_file, 'rb') as file:
         content = file.read()
 
-    encoded_content = content.encode('utf-8').decode('base64')
+    encoded_content = base64.b64encode(content).decode('utf-8')
     
     headers = {
         "Authorization": f"token {token}",
@@ -63,10 +64,14 @@ def main(pdf_url, repo, branch, token):
     return status_code
 
 if __name__ == "__main__":
-    # Input values (you can pass these from your Chrome extension)
-    pdf_url = "file:///path-to-your-pdf-file"
-    repo = "your-github-username/your-repository-name"
-    branch = "main"
-    token = "your-github-token"
+    import sys
+    if len(sys.argv) != 5:
+        print("Usage: python pdf_to_csv.py <pdf_url> <repo> <branch> <token>")
+        sys.exit(1)
+
+    pdf_url = sys.argv[1]
+    repo = sys.argv[2]
+    branch = sys.argv[3]
+    token = sys.argv[4]
 
     main(pdf_url, repo, branch, token)
