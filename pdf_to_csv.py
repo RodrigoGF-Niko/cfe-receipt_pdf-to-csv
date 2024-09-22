@@ -57,14 +57,12 @@ def upload_to_github(csv_file, repo, branch, token):
     return response.status_code
 
 # Step 4: Main function
-def main(pdf_url, repo, branch, token):
-    # Dynamic filename from URL
-    file_name = os.path.basename(pdf_url)
-    pdf_path = f"/tmp/{file_name}"
+def main(pdf_path, repo, branch, token):
+    # Dynamic filename from path
+    file_name = os.path.basename(pdf_path)
     csv_path = pdf_path.replace(".pdf", ".csv")
 
-    # Download and convert the PDF
-    download_pdf(pdf_url, pdf_path)
+    # Convert the PDF to CSV
     pdf_to_csv(pdf_path, csv_path)
 
     # Upload the CSV to GitHub
@@ -74,12 +72,12 @@ def main(pdf_url, repo, branch, token):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) != 5:
-        print("Usage: python pdf_to_csv.py <pdf_url> <repo> <branch> <token>")
+        print("Usage: python pdf_to_csv.py <pdf_path> <repo> <branch> <token>")
         sys.exit(1)
 
-    pdf_url = sys.argv[1]
+    pdf_path = sys.argv[1]
     repo = sys.argv[2]
     branch = sys.argv[3]
     token = sys.argv[4]
 
-    main(pdf_url, repo, branch, token)
+    main(pdf_path, repo, branch, token)
