@@ -26,7 +26,7 @@ jobs:
         id: identify_pdf
         run: |
           echo "Identifying uploaded PDF file"
-          pdf_file=$(git diff --name-only HEAD^ HEAD | grep 'pdf-folder/.*\.pdf')
+          pdf_file=$(git log -1 --name-only --pretty=format: | grep 'pdf-folder/.*\.pdf')
           if [ -z "$pdf_file" ]; then
             echo "Error: No PDF file found in the latest commit."
             exit 1
