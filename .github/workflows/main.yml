@@ -22,7 +22,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests PyPDF2
 
+      - name: Identify the uploaded PDF file
+        id: identify_pdf
+        run: echo "::set-output name=pdf_path::$(git diff --name-only HEAD^ HEAD | grep '.pdf')"
+
       - name: Run PDF to CSV Script
         run: |
           echo "Running PDF to CSV conversion script"
-          python pdf_to_csv.py "${{ github.event.head_commit.modified[0] }}" "RodrigoGF-Niko/cfe-receipt_pdf-to-csv" "main" "${{ secrets.GITHUB_TOKEN }}"
+          python pdf_to_csv.py "${{ steps.identify_pdf.outputs.pdf_path }}" "RodrigoGF-Niko/cfe-receipt_pdf-to-csv" "main" "${{ secrets.GITHUB_TOKEN }}"
