@@ -48,9 +48,14 @@ def upload_to_github(csv_file, repo, branch, token):
 
 # Step 3: Main function
 def main(pdf_path, repo, branch, token):
+    print(f"Main function called with pdf_path: {pdf_path}, repo: {repo}, branch: {branch}")
+    if not pdf_path:
+        print("Error: PDF path is empty")
+        return
+
     # Dynamic filename from path
     file_name = os.path.basename(pdf_path)
-    csv_path = pdf_path.replace(".pdf", ".csv")
+    csv_path = os.path.join("csv-folder", file_name.replace(".pdf", ".csv"))
 
     # Convert the PDF to CSV
     pdf_to_csv(pdf_path, csv_path)
